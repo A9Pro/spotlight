@@ -8,15 +8,17 @@ interface CategoryItem {
   price: string;
 }
 
+interface CollectionGridProps {
+  items?: CategoryItem[];
+  onItemClick: (item: CategoryItem) => void;
+  onAddToCart?: (item: CategoryItem) => void;
+}
+
 export default function CollectionGrid({
   items = [],
   onItemClick,
-  onAddToCart, // 🛍️ new prop
-}: {
-  items?: CategoryItem[];
-  onItemClick: (item: CategoryItem) => void;
-  onAddToCart?: (item: CategoryItem) => void; // optional
-}) {
+  onAddToCart,
+}: CollectionGridProps) {
   if (!items || items.length === 0) {
     return (
       <div className="text-center text-gray-500 py-10">
@@ -34,7 +36,7 @@ export default function CollectionGrid({
           image={item.image}
           price={item.price}
           onClick={() => onItemClick(item)}
-          onAddToCart={() => onAddToCart && onAddToCart(item)} // 🛍️ pass item
+          onAddToCart={() => onAddToCart && onAddToCart(item)} // ✅ fixed
         />
       ))}
     </div>
@@ -58,7 +60,7 @@ function CategoryCard({
     <motion.div
       className="relative rounded-2xl overflow-hidden shadow-lg group bg-white/5 backdrop-blur-sm border border-[#D7BFAE]/30"
       whileHover={{ scale: 1.03 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
     >
       {/* Jewelry Image */}
       <div className="relative overflow-hidden cursor-pointer" onClick={onClick}>
