@@ -16,7 +16,10 @@ const links = [
 
 export default function FloatingNav() {
   const [open, setOpen] = useState(false);
-  const { totalItems } = useCart();
+  const { cart } = useCart();
+  
+  // Calculate total items from cart
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <motion.nav
