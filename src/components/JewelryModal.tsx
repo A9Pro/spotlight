@@ -12,9 +12,11 @@ interface JewelryItem {
 export default function JewelryModal({
   item,
   onClose,
+  onAddToCart, // 🛍️ new prop
 }: {
   item: JewelryItem | null;
   onClose: () => void;
+  onAddToCart: (item: JewelryItem) => void; // 🛍️ new prop type
 }) {
   if (!item) return null;
 
@@ -61,6 +63,7 @@ export default function JewelryModal({
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
+              onClick={() => onAddToCart(item)} // 🛍️ trigger add to cart
               className="px-8 py-3 rounded-full bg-[#E87400] text-white font-semibold text-lg shadow-md hover:bg-[#C76300] transition"
             >
               Add to Cart
