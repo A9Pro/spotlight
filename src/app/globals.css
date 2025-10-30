@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  /* Light-only custom colors as CSS vars—use like bg-earth-bg */
+  --color-burnt-orange: #CC5500;
+  --color-blood-orange: #A52A2A;
+  
+  /* Font family—use like font-inter */
+  --font-family-inter: Inter, sans-serif;
+}
+
+@layer base {
+  html, body {
+    background-color: var(--color-earth-bg);
+    color: var(--color-earth-text);
+    scroll-behavior: smooth;
+    font-family: var(--font-family-inter);
+    height: 100vh;
+    overflow: auto;
+  }
+  
+  /* Lock Next.js root to full height */
+  #__next {
+    min-height: 100vh;
+  }
+}
