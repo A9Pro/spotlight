@@ -30,7 +30,7 @@ const HeroSection = () => {
 
         {/* Tagline */}
         <p className="mt-6 text-lg md:text-xl text-[#4A2C1D] leading-relaxed max-w-2xl mx-auto">
-          Own Your Light .
+          ✦Own Your Light✦
         </p>
 
         <p className="mt-6 text-lg md:text-xl text-[#4A2C1D] leading-relaxed max-w-2xl mx-auto">
