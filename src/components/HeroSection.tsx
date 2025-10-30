@@ -30,8 +30,13 @@ const HeroSection = () => {
 
         {/* Tagline */}
         <p className="mt-6 text-lg md:text-xl text-[#4A2C1D] leading-relaxed max-w-2xl mx-auto">
-          Own Your Light — Jewelry that doesn’t just adorn, it <span className="text-[#D35400] font-semibold">illuminates</span>.
+          Own Your Light .
         </p>
+
+        <p className="mt-6 text-lg md:text-xl text-[#4A2C1D] leading-relaxed max-w-2xl mx-auto">
+          Jewelry that doesn’t just adorn, it <span className="text-[#D35400] font-semibold">illuminates</span>.
+        </p>
+
 
         {/* ✨ Call-to-Action Buttons */}
         <div className="mt-10 flex flex-wrap gap-5 justify-center">
