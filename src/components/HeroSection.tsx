@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -184,7 +185,7 @@ const HeroSection = () => {
                   <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500">
                     <button className="w-full py-3 bg-gradient-to-r from-[#E87400] to-[#C47A3A] text-white font-semibold rounded-full hover:shadow-lg transition-all flex items-center justify-center space-x-2">
                       <ShoppingBag className="w-5 h-5" />
-                      <span>Quick Add</span>
+                      <span>Add to Cart</span>
                     </button>
                   </div>
                 </div>
