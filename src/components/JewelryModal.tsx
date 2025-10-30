@@ -12,11 +12,11 @@ interface JewelryItem {
 export default function JewelryModal({
   item,
   onClose,
-  onAddToCart, // 🛍️ new prop
+  onAddToCart,
 }: {
   item: JewelryItem | null;
   onClose: () => void;
-  onAddToCart: (item: JewelryItem) => void; // 🛍️ new prop type
+  onAddToCart: (item: JewelryItem) => void;
 }) {
   if (!item) return null;
 
@@ -28,7 +28,6 @@ export default function JewelryModal({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
-        {/* Modal Container */}
         <motion.div
           className="relative bg-[#FAEBD7] text-[#3B1C00] rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden"
           initial={{ scale: 0.9, opacity: 0 }}
@@ -63,7 +62,7 @@ export default function JewelryModal({
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => onAddToCart(item)} // 🛍️ trigger add to cart
+              onClick={() => onAddToCart(item)} // ✅ wired
               className="px-8 py-3 rounded-full bg-[#E87400] text-white font-semibold text-lg shadow-md hover:bg-[#C76300] transition"
             >
               Add to Cart
