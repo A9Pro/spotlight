@@ -13,7 +13,8 @@ const allJewelry = [
     image: "/images/ring1.jpg",
     category: "Rings",
     price: "₦3,920,000",
-    description: "A stunning diamond ring crafted in 18k white gold, perfect for eternal elegance.",
+    description:
+      "A stunning diamond ring crafted in 18k white gold, perfect for eternal elegance.",
   },
   {
     title: "Emerald Necklace",
@@ -27,42 +28,47 @@ const allJewelry = [
     image: "/images/earrings1.jpg",
     category: "Earrings",
     price: "₦1,570,000",
-    description: "Classic gold hoops designed for daily wear with a luxurious touch.",
+    description:
+      "Classic gold hoops designed for daily wear with a luxurious touch.",
   },
   {
     title: "Silver Bracelet",
     image: "/images/bracelet1.jpg",
     category: "Bracelets",
     price: "₦1,200,000",
-    description: "Elegant sterling silver bracelet featuring a minimalist chain design.",
+    description:
+      "Elegant sterling silver bracelet featuring a minimalist chain design.",
   },
   {
     title: "Pearl Set",
     image: "/images/set1.jpg",
     category: "Sets",
     price: "₦2,560,000",
-    description: "A timeless pearl set — necklace and earrings, crafted for sophistication.",
+    description:
+      "A timeless pearl set — necklace and earrings, crafted for sophistication.",
   },
   {
     title: "Rose Gold Band",
     image: "/images/ring2.jpg",
     category: "Rings",
     price: "₦1,840,000",
-    description: "Soft rose gold band that blends classic design with modern warmth.",
+    description:
+      "Soft rose gold band that blends classic design with modern warmth.",
   },
   {
     title: "Layered Necklace",
     image: "/images/necklace2.jpg",
     category: "Necklaces",
     price: "₦2,900,000",
-    description: "Layered chains with delicate pendants, embodying effortless luxury.",
+    description:
+      "Layered chains with delicate pendants, embodying effortless luxury.",
   },
 ];
 
 export default function Collections() {
   const [active, setActive] = useState("All");
   const [selectedItem, setSelectedItem] = useState<any>(null);
-  const [cart, setCart] = useState<any[]>([]); // 🛒 NEW — holds added items
+  const [cart, setCart] = useState<any[]>([]); // 🛍️ cart state
 
   // 🪞 Filter by category
   const filtered =
@@ -70,15 +76,12 @@ export default function Collections() {
       ? allJewelry
       : allJewelry.filter((item) => item.category === active);
 
-  // 🛍️ Function to handle Add to Cart
+  // 🛍️ Handle Add to Cart
   const handleAddToCart = (item: any) => {
-    setCart((prevCart) => {
-      // Prevent duplicates (optional)
-      if (prevCart.find((i) => i.title === item.title)) return prevCart;
-      return [...prevCart, item];
+    setCart((prev) => {
+      if (prev.find((p) => p.title === item.title)) return prev;
+      return [...prev, item];
     });
-
-    // Optional: feedback
     alert(`${item.title} added to cart!`);
   };
 
@@ -104,7 +107,7 @@ export default function Collections() {
         <CollectionGrid
           items={filtered}
           onItemClick={(item) => setSelectedItem(item)}
-          onAddToCart={handleAddToCart} // 🛍️ pass down
+          onAddToCart={handleAddToCart} // ✅ fixed
         />
       </div>
 
@@ -113,7 +116,7 @@ export default function Collections() {
         <JewelryModal
           item={selectedItem}
           onClose={() => setSelectedItem(null)}
-          onAddToCart={handleAddToCart} // 🛍️ pass down here too
+          onAddToCart={handleAddToCart} // ✅ fixed
         />
       )}
     </main>
