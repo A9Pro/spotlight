@@ -62,12 +62,25 @@ const allJewelry = [
 export default function Collections() {
   const [active, setActive] = useState("All");
   const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [cart, setCart] = useState<any[]>([]); // 🛒 NEW — holds added items
 
   // 🪞 Filter by category
   const filtered =
     active === "All"
       ? allJewelry
       : allJewelry.filter((item) => item.category === active);
+
+  // 🛍️ Function to handle Add to Cart
+  const handleAddToCart = (item: any) => {
+    setCart((prevCart) => {
+      // Prevent duplicates (optional)
+      if (prevCart.find((i) => i.title === item.title)) return prevCart;
+      return [...prevCart, item];
+    });
+
+    // Optional: feedback
+    alert(`${item.title} added to cart!`);
+  };
 
   return (
     <main className="min-h-screen bg-[#FAEBD7] text-[#3B1C00] px-6 md:px-12 py-16 transition-all duration-500">
@@ -91,12 +104,17 @@ export default function Collections() {
         <CollectionGrid
           items={filtered}
           onItemClick={(item) => setSelectedItem(item)}
+          onAddToCart={handleAddToCart} // 🛍️ pass down
         />
       </div>
 
       {/* 💍 Jewelry Modal */}
       {selectedItem && (
-        <JewelryModal item={selectedItem} onClose={() => setSelectedItem(null)} />
+        <JewelryModal
+          item={selectedItem}
+          onClose={() => setSelectedItem(null)}
+          onAddToCart={handleAddToCart} // 🛍️ pass down here too
+        />
       )}
     </main>
   );
