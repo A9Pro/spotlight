@@ -3,11 +3,71 @@
 import { useState } from "react";
 import CollectionGrid from "../../components/CollectionGrid";
 import FilterTabs from "../../components/FilterTabs";
+import JewelryModal from "../../components/JewelryModal";
 
 const categories = ["All", "Rings", "Necklaces", "Earrings", "Bracelets", "Sets"];
 
+const allJewelry = [
+  {
+    title: "Diamond Ring",
+    image: "/images/ring1.jpg",
+    category: "Rings",
+    price: "₦3,920,000",
+    description: "A stunning diamond ring crafted in 18k white gold, perfect for eternal elegance.",
+  },
+  {
+    title: "Emerald Necklace",
+    image: "/images/necklace1.jpg",
+    category: "Necklaces",
+    price: "₦5,120,000",
+    description: "Handcrafted emerald necklace with intricate gold detailing.",
+  },
+  {
+    title: "Gold Hoop Earrings",
+    image: "/images/earrings1.jpg",
+    category: "Earrings",
+    price: "₦1,570,000",
+    description: "Classic gold hoops designed for daily wear with a luxurious touch.",
+  },
+  {
+    title: "Silver Bracelet",
+    image: "/images/bracelet1.jpg",
+    category: "Bracelets",
+    price: "₦1,200,000",
+    description: "Elegant sterling silver bracelet featuring a minimalist chain design.",
+  },
+  {
+    title: "Pearl Set",
+    image: "/images/set1.jpg",
+    category: "Sets",
+    price: "₦2,560,000",
+    description: "A timeless pearl set — necklace and earrings, crafted for sophistication.",
+  },
+  {
+    title: "Rose Gold Band",
+    image: "/images/ring2.jpg",
+    category: "Rings",
+    price: "₦1,840,000",
+    description: "Soft rose gold band that blends classic design with modern warmth.",
+  },
+  {
+    title: "Layered Necklace",
+    image: "/images/necklace2.jpg",
+    category: "Necklaces",
+    price: "₦2,900,000",
+    description: "Layered chains with delicate pendants, embodying effortless luxury.",
+  },
+];
+
 export default function Collections() {
   const [active, setActive] = useState("All");
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+
+  // 🪞 Filter by category
+  const filtered =
+    active === "All"
+      ? allJewelry
+      : allJewelry.filter((item) => item.category === active);
 
   return (
     <main className="min-h-screen bg-[#FAEBD7] text-[#3B1C00] px-6 md:px-12 py-16 transition-all duration-500">
@@ -28,8 +88,16 @@ export default function Collections() {
 
       {/* 🪄 Collection Grid */}
       <div className="max-w-7xl mx-auto">
-        <CollectionGrid active={active} />
+        <CollectionGrid
+          items={filtered}
+          onItemClick={(item) => setSelectedItem(item)}
+        />
       </div>
+
+      {/* 💍 Jewelry Modal */}
+      {selectedItem && (
+        <JewelryModal item={selectedItem} onClose={() => setSelectedItem(null)} />
+      )}
     </main>
   );
 }

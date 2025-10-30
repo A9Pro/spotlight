@@ -1,103 +1,93 @@
 "use client";
 
-import { useState } from "react";
-import CategoryCard from "./CategoryCard";
-import JewelryModal from "./JewelryModal";
+import { motion } from "framer-motion";
 
-// Utility: Convert USD-like prices to Naira (using an approximate rate)
-const convertToNaira = (usd: number) => {
-  const rate = 1600; // Adjust this to current NGN/USD rate if needed
-  return Math.round(usd * rate);
-};
+interface CategoryItem {
+  title: string;
+  image: string;
+  price: string;
+}
 
-// Jewelry Collection Data
-const allJewelry = [
-  {
-    title: "Diamond Ring",
-    image: "/images/ring1.jpg",
-    category: "Rings",
-    description: "A stunning diamond ring crafted in 18k white gold, perfect for eternal elegance.",
-    priceUSD: 2450,
-  },
-  {
-    title: "Emerald Necklace",
-    image: "/images/necklace1.jpg",
-    category: "Necklaces",
-    description: "Handcrafted emerald necklace with intricate gold detailing.",
-    priceUSD: 3200,
-  },
-  {
-    title: "Gold Hoop Earrings",
-    image: "/images/earrings1.jpg",
-    category: "Earrings",
-    description: "Classic gold hoops designed for daily wear with a luxurious touch.",
-    priceUSD: 980,
-  },
-  {
-    title: "Silver Bracelet",
-    image: "/images/bracelet1.jpg",
-    category: "Bracelets",
-    description: "Elegant sterling silver bracelet featuring a minimalist chain design.",
-    priceUSD: 750,
-  },
-  {
-    title: "Pearl Set",
-    image: "/images/set1.jpg",
-    category: "Sets",
-    description: "A timeless pearl set — necklace and earrings, crafted for sophistication.",
-    priceUSD: 1600,
-  },
-  {
-    title: "Rose Gold Band",
-    image: "/images/ring2.jpg",
-    category: "Rings",
-    description: "Soft rose gold band that blends classic design with modern warmth.",
-    priceUSD: 1150,
-  },
-  {
-    title: "Layered Necklace",
-    image: "/images/necklace2.jpg",
-    category: "Necklaces",
-    description: "Layered chains with delicate pendants, embodying effortless luxury.",
-    priceUSD: 1950,
-  },
-];
-
-export default function CollectionGrid({ active }: { active: string }) {
-  const [selected, setSelected] = useState<any>(null);
-
-  // Filter by category
-  const filtered =
-    active === "All"
-      ? allJewelry
-      : allJewelry.filter((item) => item.category === active);
-
-  // Format Naira with commas and ₦ sign
-  const formatNaira = (amount: number) =>
-    `₦${amount.toLocaleString("en-NG")}`;
+export default function CollectionGrid({
+  items = [],
+  onItemClick,
+}: {
+  items?: CategoryItem[];
+  onItemClick: (item: CategoryItem) => void;
+}) {
+  // 🪞 Handle empty collections gracefully
+  if (!items || items.length === 0) {
+    return (
+      <div className="text-center text-gray-500 py-10">
+        No collections available.
+      </div>
+    );
+  }
 
   return (
-    <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-        {filtered.map((item) => (
-          <CategoryCard
-            key={item.title}
-            {...item}
-            price={formatNaira(convertToNaira(item.priceUSD))}
-            onClick={() => setSelected(item)}
-          />
-        ))}
+    <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 px-4 py-8">
+      {items.map((item, index) => (
+        <CategoryCard
+          key={index}
+          title={item.title}
+          image={item.image}
+          price={item.price}
+          onClick={() => onItemClick(item)}
+        />
+      ))}
+    </div>
+  );
+}
+
+function CategoryCard({
+  title,
+  image,
+  price,
+  onClick,
+}: {
+  title: string;
+  image: string;
+  price: string;
+  onClick: () => void;
+}) {
+  return (
+    <motion.div
+      className="relative rounded-2xl overflow-hidden shadow-lg cursor-pointer group bg-white/5 backdrop-blur-sm border border-[#D7BFAE]/30"
+      whileHover={{ scale: 1.03 }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
+      onClick={onClick}
+    >
+      {/* Jewelry Image */}
+      <div className="relative overflow-hidden">
+        <img
+          src={image}
+          alt={title}
+          className="object-cover w-full h-80 transition-transform duration-500 group-hover:scale-110 group-hover:brightness-90"
+        />
+
+        {/* Overlay gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-70" />
+
+        {/* Quick View Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileHover={{ opacity: 1, y: 0 }}
+          className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+        >
+          <button className="px-6 py-2 rounded-full bg-[#E87400] text-white font-semibold shadow-md hover:bg-[#C76300] transition">
+            Quick View
+          </button>
+        </motion.div>
       </div>
 
-      {selected && (
-        <JewelryModal
-          item={{
-            ...selected,
-            price: formatNaira(convertToNaira(selected.priceUSD)),
-          }}
-          onClose={() => setSelected(null)}
-        />
-      )}
-    </>
+      {/* Details */}
+      <div className="p-5 text-center">
+        <h2 className="text-xl font-semibold text-[#3B1C00]">{title}</h2>
+        <p className="mt-2 text-lg font-medium text-[#D35400]">{price}</p>
+      </div>
+
+      {/* Flare hover effect */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition bg-gradient-to-r from-[#FFD580] via-white to-[#FFD580] blur-2xl"></div>
+    </motion.div>
   );
 }
