@@ -1,97 +1,61 @@
 "use client";
 
-import { motion } from "framer-motion";
+import Image from "next/image";
 
-interface CategoryItem {
-  title: string;
+interface JewelryItem {
+  id: number;
+  name: string;
+  category: string;
   image: string;
-  price: string;
+  price: number;
 }
 
 interface CollectionGridProps {
-  items?: CategoryItem[];
-  onItemClick: (item: CategoryItem) => void;
-  onAddToCart?: (item: CategoryItem) => void;
+  active: string;
 }
 
-export default function CollectionGrid({
-  items = [],
-  onItemClick,
-  onAddToCart,
-}: CollectionGridProps) {
-  if (!items || items.length === 0) {
-    return (
-      <div className="text-center text-gray-500 py-10">
-        No collections available.
-      </div>
-    );
-  }
+const jewelryItems: JewelryItem[] = [
+  { id: 1, name: "Emerald Ring", category: "Rings", image: "/images/ring1.jpg", price: 25000 },
+  { id: 2, name: "Diamond Necklace", category: "Necklaces", image: "/images/necklace1.jpg", price: 42000 },
+  { id: 3, name: "Pearl Earrings", category: "Earrings", image: "/images/earring1.jpg", price: 15000 },
+  { id: 4, name: "Gold Bracelet", category: "Bracelets", image: "/images/bracelet1.jpg", price: 18000 },
+  { id: 5, name: "Bridal Set", category: "Sets", image: "/images/set1.jpg", price: 60000 },
+];
+
+export default function CollectionGrid({ active }: CollectionGridProps) {
+  // 🧠 Safety check — never map undefined
+  const filtered =
+    active === "All"
+      ? jewelryItems
+      : jewelryItems.filter((item) => item.category === active);
 
   return (
-    <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 px-4 py-8">
-      {items.map((item, index) => (
-        <CategoryCard
-          key={index}
-          title={item.title}
-          image={item.image}
-          price={item.price}
-          onClick={() => onItemClick(item)}
-          onAddToCart={() => onAddToCart && onAddToCart(item)} // ✅ fixed
-        />
-      ))}
-    </div>
-  );
-}
-
-function CategoryCard({
-  title,
-  image,
-  price,
-  onClick,
-  onAddToCart,
-}: {
-  title: string;
-  image: string;
-  price: string;
-  onClick: () => void;
-  onAddToCart?: () => void;
-}) {
-  return (
-    <motion.div
-      className="relative rounded-2xl overflow-hidden shadow-lg group bg-white/5 backdrop-blur-sm border border-[#D7BFAE]/30"
-      whileHover={{ scale: 1.03 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-    >
-      {/* Jewelry Image */}
-      <div className="relative overflow-hidden cursor-pointer" onClick={onClick}>
-        <img
-          src={image}
-          alt={title}
-          className="object-cover w-full h-80 transition-transform duration-500 group-hover:scale-110 group-hover:brightness-90"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-70" />
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-          <button className="px-6 py-2 rounded-full bg-[#E87400] text-white font-semibold shadow-md hover:bg-[#C76300] transition">
-            Quick View
-          </button>
-        </div>
-      </div>
-
-      {/* Details */}
-      <div className="p-5 text-center">
-        <h2 className="text-xl font-semibold text-[#3B1C00]">{title}</h2>
-        <p className="mt-2 text-lg font-medium text-[#D35400]">{price}</p>
-
-        {/* Add to Cart Button */}
-        {onAddToCart && (
-          <button
-            onClick={onAddToCart}
-            className="mt-4 px-4 py-2 rounded-full bg-[#E87400] text-white font-semibold hover:bg-[#C76300] transition"
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8">
+      {filtered.length > 0 ? (
+        filtered.map((item) => (
+          <div
+            key={item.id}
+            className="bg-white/80 shadow-md rounded-2xl p-4 hover:scale-105 transition-all duration-300 cursor-pointer"
           >
-            Add to Cart
-          </button>
-        )}
-      </div>
-    </motion.div>
+            <div className="relative w-full h-48 rounded-xl overflow-hidden">
+              <Image
+                src={item.image}
+                alt={item.name}
+                fill
+                className="object-cover"
+              />
+            </div>
+            <h3 className="mt-4 font-semibold text-lg">{item.name}</h3>
+            <p className="text-[#D35400] font-medium">
+              ₦{item.price.toLocaleString()}
+            </p>
+          </div>
+        ))
+      ) : (
+        <p className="col-span-full text-center text-gray-500 text-lg">
+          No items found in this category.
+        </p>
+      )}
+    </div>
   );
 }
