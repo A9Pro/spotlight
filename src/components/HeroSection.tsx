@@ -1,26 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence, useScroll } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
   Heart,
   ShoppingBag,
   Star,
-  Sparkles,
-  Shield,
-  Truck,
-  Award,
   CheckCircle,
   X,
+  Loader2,
 } from "lucide-react";
 
 const HeroSection = () => {
   const router = useRouter();
+  const { scrollY } = useScroll(); // New: SSR-safe scroll hook
   const [favorites, setFavorites] = useState(new Set());
   const [cart, setCart] = useState([]);
   const [previewProduct, setPreviewProduct] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   const featuredProducts = [
     {
@@ -61,34 +61,86 @@ const HeroSection = () => {
     },
   ];
 
+  // Load persisted state on mount
+  useEffect(() => {
+    const savedFavorites = localStorage.getItem("spotlight-favorites");
+    if (savedFavorites) setFavorites(new Set(JSON.parse(savedFavorites)));
+
+    const savedCart = localStorage.getItem("spotlight-cart");
+    if (savedCart) setCart(JSON.parse(savedCart));
+  }, []);
+
+  // Save state to localStorage on changes
+  useEffect(() => {
+    localStorage.setItem("spotlight-favorites", JSON.stringify(Array.from(favorites)));
+  }, [favorites]);
+
+  useEffect(() => {
+    localStorage.setItem("spotlight-cart", JSON.stringify(cart));
+  }, [cart]);
+
   const toggleFavorite = (id: number) => {
     setFavorites((prev) => {
       const newFavs = new Set(prev);
-      newFavs.has(id) ? newFavs.delete(id) : newFavs.add(id);
+      if (newFavs.has(id)) {
+        newFavs.delete(id);
+      } else {
+        newFavs.add(id);
+      }
       return newFavs;
     });
   };
 
-  const addToCart = (product) => {
-    setCart((prev) => [...prev, product]);
+  const addToCart = async (product) => {
+    setIsAddingToCart(true);
+    setCart((prev) => {
+      const existingIndex = prev.findIndex((item) => item.id === product.id);
+      if (existingIndex >= 0) {
+        const updated = [...prev];
+        updated[existingIndex].quantity = (updated[existingIndex].quantity || 1) + 1;
+        return updated;
+      }
+      return [...prev, { ...product, quantity: 1 }];
+    });
     setShowSuccess(true);
     setTimeout(() => setShowSuccess(false), 2000);
+    setIsAddingToCart(false);
   };
+
+  // Close modal on Escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setPreviewProduct(null);
+    };
+    if (previewProduct) {
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
+    }
+  }, [previewProduct]);
+
+  const isFavorite = (id: number) => favorites.has(id);
 
   return (
     <>
       {/* === HERO SECTION === */}
-      <section
-        className="relative min-h-screen flex flex-col items-center justify-center text-center overflow-hidden bg-cover bg-center bg-no-repeat p-6"
-        style={{
-          backgroundImage: "url('/images/hero-bg.jpg')",
-        }}
-      >
+      <section className="relative min-h-screen flex flex-col items-center justify-center text-center overflow-hidden p-6">
+        <Image
+          src="/images/hero-bg.jpg"
+          alt="Hero background"
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-[#F7E7CE]/70 via-[#FAEBD7]/60 to-[#E87400]/40 backdrop-blur-[2px]" />
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2 }}
+          style={{ 
+            y: scrollY * 0.5, // Fixed: SSR-safe parallax using MotionValue
+            transform: `translateY(${scrollY * 0.5}px)` // Fallback for compatibility
+          }}
           className="relative z-10 px-8 py-16 max-w-3xl w-full rounded-[2rem] bg-white/10 backdrop-blur-2xl border border-white/20 shadow-2xl"
         >
           <h1 className="text-6xl md:text-7xl font-extrabold tracking-tight text-[#3B1C00]">
@@ -100,6 +152,7 @@ const HeroSection = () => {
               whileHover={{ scale: 1.05 }}
               onClick={() => router.push("/ai-consultation")}
               className="px-10 py-4 rounded-full bg-gradient-to-r from-[#E87400] to-[#C47A3A] text-white font-semibold"
+              aria-label="Start AI Consultation"
             >
               Start AI Consultation
             </motion.button>
@@ -107,6 +160,7 @@ const HeroSection = () => {
               whileHover={{ scale: 1.05 }}
               onClick={() => router.push("/collection")}
               className="px-10 py-4 rounded-full border-2 border-[#4A2C1D] text-[#4A2C1D] font-semibold hover:bg-[#4A2C1D] hover:text-[#F7E7CE]"
+              aria-label="Explore Collection"
             >
               Explore Collection
             </motion.button>
@@ -130,15 +184,27 @@ const HeroSection = () => {
                 viewport={{ once: true }}
                 className="group relative bg-white rounded-2xl overflow-hidden border-2 border-[#E87400]/20 hover:border-[#E87400] transition-all"
               >
-                <div
-                  className="relative overflow-hidden aspect-square cursor-pointer"
-                  onClick={() => setPreviewProduct(product)}
-                >
-                  <img
+                <div className="relative overflow-hidden aspect-square cursor-pointer" onClick={() => setPreviewProduct(product)}>
+                  <Image
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                    fill
+                    className="object-cover transform group-hover:scale-110 transition-transform duration-700"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                   />
+                  <motion.button
+                    className="absolute top-3 right-3 bg-white/90 hover:bg-white rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                    whileTap={{ scale: 0.95 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite(product.id);
+                    }}
+                    aria-label={`Toggle favorite for ${product.name}`}
+                  >
+                    <Heart
+                      className={`w-5 h-5 transition-colors ${isFavorite(product.id) ? "fill-[#E87400] text-[#E87400]" : "text-gray-500"}`}
+                    />
+                  </motion.button>
                 </div>
                 <div className="p-6 bg-[#FAEBD7]/50">
                   <div className="flex items-center justify-between mb-2">
@@ -165,10 +231,18 @@ const HeroSection = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => addToCart(product)}
-                    className="w-full py-3 bg-gradient-to-r from-[#E87400] to-[#C47A3A] text-white font-semibold rounded-full flex items-center justify-center space-x-2"
+                    disabled={isAddingToCart}
+                    className="w-full py-3 bg-gradient-to-r from-[#E87400] to-[#C47A3A] text-white font-semibold rounded-full flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label={`Add ${product.name} to cart`}
                   >
-                    <ShoppingBag className="w-5 h-5" />
-                    <span>Add to Cart</span>
+                    {isAddingToCart ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <>
+                        <ShoppingBag className="w-5 h-5" />
+                        <span>Add to Cart</span>
+                      </>
+                    )}
                   </motion.button>
                 </div>
               </motion.div>
@@ -185,28 +259,45 @@ const HeroSection = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            onClick={() => setPreviewProduct(null)}
           >
             <motion.div
               className="bg-white rounded-3xl overflow-hidden max-w-lg w-full shadow-2xl relative"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={() => setPreviewProduct(null)}
                 className="absolute top-4 right-4 bg-white rounded-full p-2 shadow"
+                aria-label="Close preview"
               >
                 <X className="w-5 h-5 text-[#3B1C00]" />
               </button>
-              <img
+              <Image
                 src={previewProduct.image}
                 alt={previewProduct.name}
+                width={500}
+                height={256}
                 className="w-full h-64 object-cover"
               />
               <div className="p-6">
-                <h3 className="text-2xl font-bold text-[#3B1C00] mb-2">
-                  {previewProduct.name}
-                </h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-2xl font-bold text-[#3B1C00]">
+                    {previewProduct.name}
+                  </h3>
+                  <motion.button
+                    className="bg-white rounded-full p-2 shadow"
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => toggleFavorite(previewProduct.id)}
+                    aria-label={`Toggle favorite for ${previewProduct.name}`}
+                  >
+                    <Heart
+                      className={`w-5 h-5 transition-colors ${isFavorite(previewProduct.id) ? "fill-[#E87400] text-[#E87400]" : "text-gray-500"}`}
+                    />
+                  </motion.button>
+                </div>
                 <p className="text-[#4A2C1D] mb-3">
                   {previewProduct.category} Collection
                 </p>
@@ -219,10 +310,18 @@ const HeroSection = () => {
                     addToCart(previewProduct);
                     setPreviewProduct(null);
                   }}
-                  className="w-full py-3 bg-gradient-to-r from-[#E87400] to-[#C47A3A] text-white font-semibold rounded-full flex items-center justify-center space-x-2"
+                  disabled={isAddingToCart}
+                  className="w-full py-3 bg-gradient-to-r from-[#E87400] to-[#C47A3A] text-white font-semibold rounded-full flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label={`Add ${previewProduct.name} to cart`}
                 >
-                  <ShoppingBag className="w-5 h-5" />
-                  <span>Add to Cart</span>
+                  {isAddingToCart ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <ShoppingBag className="w-5 h-5" />
+                      <span>Add to Cart</span>
+                    </>
+                  )}
                 </motion.button>
               </div>
             </motion.div>
@@ -235,9 +334,10 @@ const HeroSection = () => {
         {showSuccess && (
           <motion.div
             className="fixed bottom-8 right-8 bg-[#3B1C00] text-white px-6 py-3 rounded-full shadow-lg flex items-center space-x-2 z-50"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
             <CheckCircle className="w-5 h-5 text-[#E87400]" />
             <span>Added to Cart Successfully!</span>

@@ -8,7 +8,7 @@ export default function ContactPage() {
     <div
       className="relative min-h-screen flex flex-col justify-center text-[#4A2C1D]"
       style={{
-        backgroundImage: "url('/images/hero-bg.jpg')", // same as HeroSection
+        backgroundImage: "url('/images/hero-bg.jpg')", 
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}

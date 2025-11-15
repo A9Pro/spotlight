@@ -7,7 +7,7 @@ import { CartProvider } from "../components/context/CartContext";
 export const metadata = {
   title: "SpotLight Jewelries ✦ Own Your Light",
   description:
-    "Discover premium Nigerian jewelry curated by AI. Rings, necklaces, earrings, and more — all shining for your style.",
+    "Discover premium Nigerian jewelry. Rings, necklaces, earrings, and more — all shining for your style.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
